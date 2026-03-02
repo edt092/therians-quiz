@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Cinzel, Raleway } from 'next/font/google'
 import './globals.css'
+import { getLocale } from '@/lib/locale'
 
 const cinzel = Cinzel({
   subsets: ['latin'],
@@ -38,14 +39,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const locale = await getLocale()
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${cinzel.variable} ${raleway.variable}`}
     >
       <body>{children}</body>

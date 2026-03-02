@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { getLocale } from '@/lib/locale'
+import { ui } from '@/lib/i18n'
 
 const FLOATING_ANIMALS = [
   { emoji: '🐺', delay: '0s',   dur: '7s',   x: '8%',   y: '18%',  size: '3.2rem', opacity: 0.07 },
@@ -9,7 +11,10 @@ const FLOATING_ANIMALS = [
   { emoji: '🐯', delay: '1.8s', dur: '9.5s', x: '88%',  y: '45%',  size: '2.9rem', opacity: 0.06 },
 ]
 
-export default function HomePage() {
+export default async function HomePage() {
+  const locale = await getLocale()
+  const t = ui[locale].landing
+
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-mystic-dark px-5">
 
@@ -48,7 +53,7 @@ export default function HomePage() {
           style={{ animation: 'fadeInUp 0.6s ease 0.1s both' }}
         >
           <span className="text-gold/70 text-[10px] font-cinzel tracking-[0.3em] uppercase">
-            Test de Personalidad
+            {t.label}
           </span>
         </div>
 
@@ -60,9 +65,9 @@ export default function HomePage() {
             animation: 'fadeInUp 0.7s ease 0.2s both',
           }}
         >
-          <span className="text-shimmer-gold">Animal</span>
+          <span className="text-shimmer-gold">{t.title1}</span>
           <br />
-          <span className="text-white">Secreto</span>
+          <span className="text-white">{t.title2}</span>
         </h1>
 
         {/* Divider */}
@@ -80,7 +85,7 @@ export default function HomePage() {
           className="text-white/55 text-base font-raleway font-light tracking-wide mb-2"
           style={{ animation: 'fadeInUp 0.6s ease 0.45s both' }}
         >
-          Descubre tu Instinto Real
+          {t.subtitle}
         </p>
 
         {/* Body copy */}
@@ -88,9 +93,12 @@ export default function HomePage() {
           className="text-white/35 text-sm font-raleway leading-relaxed mb-10 max-w-sm"
           style={{ animation: 'fadeInUp 0.6s ease 0.55s both' }}
         >
-          Todos llevamos un animal dentro.
-          <br />
-          La pregunta es: ¿tienes el valor de conocerlo?
+          {t.body.split('\n').map((line, i) => (
+            <span key={i}>
+              {line}
+              {i === 0 && <br />}
+            </span>
+          ))}
         </p>
 
         {/* Animal row */}
@@ -118,7 +126,7 @@ export default function HomePage() {
             animation: 'fadeInUp 0.6s ease 0.75s both, pulseGold 2.5s ease-in-out 1.4s infinite',
           }}
         >
-          Descubrir mi Animal
+          {t.cta}
           <svg
             className="w-4 h-4 transition-transform group-hover:translate-x-1"
             fill="none"
@@ -135,7 +143,7 @@ export default function HomePage() {
           className="mt-6 text-white/20 text-[11px] font-raleway tracking-widest"
           style={{ animation: 'fadeInUp 0.6s ease 0.9s both' }}
         >
-          15 preguntas &nbsp;·&nbsp; 6 animales &nbsp;·&nbsp; 1 verdad
+          {t.meta}
         </p>
       </div>
 

@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { animals, animalKeys, type AnimalKey } from '@/lib/animals'
+import { getLocale } from '@/lib/locale'
+import { ui, animalText } from '@/lib/i18n'
 import ShareButtons from '@/components/ShareButtons'
 
 interface Props {
@@ -15,23 +17,24 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { animal: animalKey } = await params
-  const animal = animals[animalKey as AnimalKey]
-  if (!animal) return {}
+  const locale = await getLocale()
+  const text = animalText[locale][animalKey as AnimalKey]
+  if (!text) return {}
   return {
-    title: animal.seoTitle,
-    description: animal.seoDescription,
-    keywords: animal.seoKeywords,
+    title: text.seoTitle,
+    description: text.seoDescription,
+    keywords: text.seoKeywords,
     openGraph: {
-      title: animal.seoTitle,
-      description: animal.seoDescription,
+      title: text.seoTitle,
+      description: text.seoDescription,
       type: 'website',
-      locale: 'es_ES',
-      siteName: 'Animal Secreto',
+      locale: locale === 'en' ? 'en_US' : 'es_ES',
+      siteName: locale === 'en' ? 'Secret Animal' : 'Animal Secreto',
     },
     twitter: {
       card: 'summary_large_image',
-      title: animal.seoTitle,
-      description: animal.seoDescription,
+      title: text.seoTitle,
+      description: text.seoDescription,
     },
   }
 }
@@ -41,6 +44,10 @@ export default async function ResultPage({ params, searchParams }: Props) {
   const { pct } = await searchParams
   const animal = animals[animalKey as AnimalKey]
   if (!animal) notFound()
+
+  const locale = await getLocale()
+  const text = animalText[locale][animalKey as AnimalKey]
+  const t = ui[locale].result
 
   const rawPct = parseInt(pct ?? '82', 10)
   const percentage = isNaN(rawPct) ? 82 : Math.min(96, Math.max(65, rawPct))
@@ -73,7 +80,7 @@ export default async function ResultPage({ params, searchParams }: Props) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-          Volver al inicio
+          {t.backHome}
         </Link>
       </div>
 
@@ -112,7 +119,7 @@ export default async function ResultPage({ params, searchParams }: Props) {
                 animation: 'fadeIn 0.5s ease 0.5s both',
               }}
             >
-              ✦ {percentage}% {animal.name} ✦
+              ✦ {percentage}% {text.name} ✦
             </div>
 
             {/* Name */}
@@ -123,7 +130,7 @@ export default async function ResultPage({ params, searchParams }: Props) {
                 animation: 'fadeInUp 0.5s ease 0.4s both',
               }}
             >
-              {animal.name}
+              {text.name}
             </h1>
 
             {/* Identity statement */}
@@ -131,7 +138,7 @@ export default async function ResultPage({ params, searchParams }: Props) {
               className="text-white/75 font-raleway font-light text-base md:text-lg leading-relaxed max-w-md mx-auto italic"
               style={{ animation: 'fadeInUp 0.5s ease 0.55s both' }}
             >
-              &ldquo;{animal.identity}&rdquo;
+              &ldquo;{text.identity}&rdquo;
             </p>
 
             {/* Divider */}
@@ -155,7 +162,7 @@ export default async function ResultPage({ params, searchParams }: Props) {
                 animation: 'fadeInUp 0.5s ease 0.65s both',
               }}
             >
-              {animal.aesthetic}
+              {text.aesthetic}
             </p>
           </div>
         </div>
@@ -163,10 +170,10 @@ export default async function ResultPage({ params, searchParams }: Props) {
         {/* ── Traits ── */}
         <div style={{ animation: 'fadeInUp 0.5s ease 0.5s both' }}>
           <p className="text-white/25 text-[10px] font-cinzel tracking-[0.3em] uppercase mb-3 text-center">
-            Tus rasgos
+            {t.yourTraits}
           </p>
           <div className="flex flex-wrap gap-2 justify-center">
-            {animal.traits.map((trait) => (
+            {text.traits.map((trait) => (
               <span
                 key={trait}
                 className="px-4 py-1.5 rounded-full text-xs font-raleway font-medium"
@@ -201,11 +208,11 @@ export default async function ResultPage({ params, searchParams }: Props) {
                 className="text-[10px] font-cinzel tracking-[0.2em] uppercase"
                 style={{ color: animal.accentColor }}
               >
-                Fortaleza
+                {t.strength}
               </span>
             </div>
             <p className="text-white/65 text-sm font-raleway leading-relaxed">
-              {animal.strength}
+              {text.strength}
             </p>
           </div>
 
@@ -214,11 +221,11 @@ export default async function ResultPage({ params, searchParams }: Props) {
             <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">🌑</span>
               <span className="text-[10px] font-cinzel tracking-[0.2em] uppercase text-white/35">
-                Sombra
+                {t.shadow}
               </span>
             </div>
             <p className="text-white/45 text-sm font-raleway leading-relaxed">
-              {animal.shadow}
+              {text.shadow}
             </p>
           </div>
         </div>
@@ -229,8 +236,9 @@ export default async function ResultPage({ params, searchParams }: Props) {
           style={{ animation: 'fadeInUp 0.5s ease 0.7s both' }}
         >
           <ShareButtons
-            shareText={animal.shareText}
+            shareText={text.shareText}
             animalEmoji={animal.emoji}
+            locale={locale}
           />
         </div>
 
@@ -247,7 +255,7 @@ export default async function ResultPage({ params, searchParams }: Props) {
               <path d="M1 4v6h6M23 20v-6h-6" />
               <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15" />
             </svg>
-            Volver a hacer el test
+            {t.retry}
           </Link>
         </div>
 

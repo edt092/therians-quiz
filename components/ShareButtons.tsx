@@ -1,13 +1,17 @@
 'use client'
 
 import { useState } from 'react'
+import { ui } from '@/lib/i18n'
+import type { Locale } from '@/lib/locale'
 
 interface ShareButtonsProps {
   shareText: string
   animalEmoji: string
+  locale: Locale
 }
 
-export default function ShareButtons({ shareText, animalEmoji }: ShareButtonsProps) {
+export default function ShareButtons({ shareText, animalEmoji, locale }: ShareButtonsProps) {
+  const t = ui[locale].result
   const [copied, setCopied] = useState(false)
 
   const getUrl = () =>
@@ -44,7 +48,7 @@ export default function ShareButtons({ shareText, animalEmoji }: ShareButtonsPro
   return (
     <div className="space-y-5">
       <p className="text-white/30 text-[10px] text-center uppercase tracking-[0.22em] font-cinzel">
-        Compartir resultado
+        {t.shareTitle}
       </p>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -62,7 +66,7 @@ export default function ShareButtons({ shareText, animalEmoji }: ShareButtonsPro
           >
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
           </svg>
-          Compartir en X
+          {t.shareOnX}
         </button>
 
         {/* WhatsApp */}
@@ -102,7 +106,7 @@ export default function ShareButtons({ shareText, animalEmoji }: ShareButtonsPro
               >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              Copiado
+              {t.copied}
             </>
           ) : (
             <>
@@ -119,7 +123,7 @@ export default function ShareButtons({ shareText, animalEmoji }: ShareButtonsPro
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
               </svg>
-              Copiar link
+              {t.copyLink}
             </>
           )}
         </button>

@@ -4,42 +4,35 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { questions } from '@/lib/questions'
 import { calculateResult } from '@/lib/scoring'
+import { ui, questionText } from '@/lib/i18n'
+import type { Locale } from '@/lib/locale'
 import ProgressBar from './ProgressBar'
 
 type Phase = 'quiz' | 'loading'
 
-const MICROCOPY = [
-  'Confía en tu primer instinto…',
-  'No hay respuestas correctas, solo verdades…',
-  'Siente la respuesta antes de pensarla…',
-  'Tu instinto ya sabe quién eres…',
-  'Ya casi descubres tu verdadero animal…',
-  'El universo está tomando nota…',
-]
+interface QuizFlowProps {
+  locale: Locale
+}
 
-const LOADING_TEXTS = [
-  'Analizando tu energía…',
-  'Leyendo tu instinto…',
-  'Consultando el universo…',
-  'Revelando tu esencia…',
-]
-
-export default function QuizFlow() {
+export default function QuizFlow({ locale }: QuizFlowProps) {
   const router = useRouter()
+  const t = ui[locale].quiz
+
   const [phase, setPhase] = useState<Phase>('quiz')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [animState, setAnimState] = useState<'in' | 'out'>('in')
-  const [loadingText, setLoadingText] = useState(0)
+  const [loadingTextIndex, setLoadingTextIndex] = useState(0)
 
   const adInjected = useRef(false)
 
   const question = questions[currentIndex]
+  const qText = questionText[locale][currentIndex]
   const progress = ((currentIndex) / questions.length) * 100
-  const microcopy = MICROCOPY[Math.min(
-    Math.floor((currentIndex / questions.length) * MICROCOPY.length),
-    MICROCOPY.length - 1
+  const microcopy = t.microcopy[Math.min(
+    Math.floor((currentIndex / questions.length) * t.microcopy.length),
+    t.microcopy.length - 1
   )]
 
   // Inject popunder script exactly when the last question renders
@@ -56,10 +49,10 @@ export default function QuizFlow() {
   useEffect(() => {
     if (phase !== 'loading') return
     const iv = setInterval(() => {
-      setLoadingText((t) => (t + 1) % LOADING_TEXTS.length)
+      setLoadingTextIndex((i) => (i + 1) % t.loadingTexts.length)
     }, 600)
     return () => clearInterval(iv)
-  }, [phase])
+  }, [phase, t.loadingTexts.length])
 
   const handleSelect = useCallback(
     (answerId: string) => {
@@ -92,7 +85,7 @@ export default function QuizFlow() {
   )
 
   if (phase === 'loading') {
-    return <LoadingScreen text={LOADING_TEXTS[loadingText]} />
+    return <LoadingScreen text={t.loadingTexts[loadingTextIndex]} moment={t.moment} />
   }
 
   return (
@@ -112,7 +105,7 @@ export default function QuizFlow() {
             transition: 'opacity 0.28s ease',
           }}
         >
-          Pregunta {String(currentIndex + 1).padStart(2, '0')} de {questions.length}
+          {t.questionWord} {String(currentIndex + 1).padStart(2, '0')} {t.ofWord} {questions.length}
         </span>
 
         {/* Question text */}
@@ -126,7 +119,7 @@ export default function QuizFlow() {
             animation: animState === 'in' ? 'fadeInUp 0.5s ease forwards' : 'none',
           }}
         >
-          {question.text}
+          {qText.text}
         </h2>
 
         {/* Answers */}
@@ -167,7 +160,7 @@ export default function QuizFlow() {
                 <span className="text-gold/30 text-[10px] font-mono mr-3 align-middle">
                   {answer.id.toUpperCase()}
                 </span>
-                {answer.text}
+                {qText.answers[idx].text}
               </button>
             )
           })}
@@ -188,7 +181,7 @@ export default function QuizFlow() {
   )
 }
 
-function LoadingScreen({ text }: { text: string }) {
+function LoadingScreen({ text, moment }: { text: string; moment: string }) {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center bg-mystic-dark"
@@ -229,7 +222,7 @@ function LoadingScreen({ text }: { text: string }) {
             {text}
           </p>
           <p className="text-white/25 text-xs mt-3 font-raleway tracking-wider">
-            Esto tomará solo un momento
+            {moment}
           </p>
         </div>
       </div>
