@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Script from 'next/script'
 import { animals, animalKeys, type AnimalKey } from '@/lib/animals'
 import ShareButtons from '@/components/ShareButtons'
 
@@ -46,6 +47,11 @@ export default async function ResultPage({ params, searchParams }: Props) {
   const percentage = isNaN(rawPct) ? 82 : Math.min(96, Math.max(65, rawPct))
 
   return (
+    <>
+    <Script
+      src="https://pl28831521.effectivegatecpm.com/26/d2/e1/26d2e1a50bd594ee3f704e963c59edd7.js"
+      strategy="afterInteractive"
+    />
     <main
       className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start"
       style={{
@@ -253,5 +259,6 @@ export default async function ResultPage({ params, searchParams }: Props) {
 
       </div>
     </main>
+    </>
   )
 }
