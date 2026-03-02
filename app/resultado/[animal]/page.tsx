@@ -5,8 +5,8 @@ import { animals, animalKeys, type AnimalKey } from '@/lib/animals'
 import ShareButtons from '@/components/ShareButtons'
 
 interface Props {
-  params: { animal: string }
-  searchParams: { pct?: string }
+  params: Promise<{ animal: string }>
+  searchParams: Promise<{ pct?: string }>
 }
 
 export function generateStaticParams() {
@@ -14,7 +14,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const animal = animals[params.animal as AnimalKey]
+  const { animal: animalKey } = await params
+  const animal = animals[animalKey as AnimalKey]
   if (!animal) return {}
   return {
     title: animal.seoTitle,
@@ -35,11 +36,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function ResultPage({ params, searchParams }: Props) {
-  const animal = animals[params.animal as AnimalKey]
+export default async function ResultPage({ params, searchParams }: Props) {
+  const { animal: animalKey } = await params
+  const { pct } = await searchParams
+  const animal = animals[animalKey as AnimalKey]
   if (!animal) notFound()
 
-  const rawPct = parseInt(searchParams.pct ?? '82', 10)
+  const rawPct = parseInt(pct ?? '82', 10)
   const percentage = isNaN(rawPct) ? 82 : Math.min(96, Math.max(65, rawPct))
 
   return (
