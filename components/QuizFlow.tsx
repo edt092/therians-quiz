@@ -40,6 +40,14 @@ export default function QuizFlow() {
     MICROCOPY.length - 1
   )]
 
+  // Preload popunder ad on second-to-last question so it fires on the last answer click
+  useEffect(() => {
+    if (currentIndex < questions.length - 2) return
+    const script = document.createElement('script')
+    script.src = 'https://pl28831521.effectivegatecpm.com/26/d2/e1/26d2e1a50bd594ee3f704e963c59edd7.js'
+    document.head.appendChild(script)
+  }, [currentIndex])
+
   // Cycle loading text
   useEffect(() => {
     if (phase !== 'loading') return
