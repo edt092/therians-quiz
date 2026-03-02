@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { questions } from '@/lib/questions'
 import { calculateResult } from '@/lib/scoring'
@@ -33,6 +33,8 @@ export default function QuizFlow() {
   const [animState, setAnimState] = useState<'in' | 'out'>('in')
   const [loadingText, setLoadingText] = useState(0)
 
+  const adInjected = useRef(false)
+
   const question = questions[currentIndex]
   const progress = ((currentIndex) / questions.length) * 100
   const microcopy = MICROCOPY[Math.min(
@@ -40,9 +42,11 @@ export default function QuizFlow() {
     MICROCOPY.length - 1
   )]
 
-  // Preload popunder ad on second-to-last question so it fires on the last answer click
+  // Inject popunder script exactly when the last question renders
+  // so the script is loaded and ready when the user clicks their final answer
   useEffect(() => {
-    if (currentIndex < questions.length - 2) return
+    if (currentIndex !== questions.length - 1 || adInjected.current) return
+    adInjected.current = true
     const script = document.createElement('script')
     script.src = 'https://pl28831521.effectivegatecpm.com/26/d2/e1/26d2e1a50bd594ee3f704e963c59edd7.js'
     document.head.appendChild(script)
