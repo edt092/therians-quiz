@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cinzel, Raleway } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 
 const cinzel = Cinzel({
@@ -48,6 +49,12 @@ export default function RootLayout({
       lang="es"
       className={`${cinzel.variable} ${raleway.variable}`}
     >
+      <head>
+        <Script
+          src="https://pl28831521.effectivegatecpm.com/26/d2/e1/26d2e1a50bd594ee3f704e963c59edd7.js"
+          strategy="afterInteractive"
+        />
+      </head>
       <body>{children}</body>
     </html>
   )
